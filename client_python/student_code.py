@@ -4,21 +4,17 @@ OOP - Ex4
 Very simple GUI example for python client to communicates with the server and "play the game!"
 """
 import ast
-import subprocess
 from ctypes.wintypes import RGB
-from types import SimpleNamespace
 from client import Client
 import json
-from pygame import gfxdraw
 import pygame
 from pygame import *
 import math
-from client_python.pokemon import pokemon
-from src import *
-from src.GraphAlgo import GraphAlgo
-from src.Node import Node
-from client_python.agent import agent
 
+from game_display import *
+from client_python.pokemon import pokemon
+from src.GraphAlgo import GraphAlgo
+from client_python.agent import agent
 
 # init pygame
 WIDTH, HEIGHT = 1080, 720
@@ -27,9 +23,9 @@ WIDTH, HEIGHT = 1080, 720
 PORT = 6666
 # server host (default localhost 127.0.0.1)
 HOST = '127.0.0.1'
-pygame.init()
-#subprocess.Popen(["powershell.exe", "java -jar Ex4_Server_v0.0.jar 5"])
 
+
+pygame.init()
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
 clock = pygame.time.Clock()
 pygame.font.init()
@@ -38,25 +34,13 @@ pygame.display.update()
 client = Client()
 client.start_connection(HOST, PORT)
 
-# pokemons = client.get_pokemons()
-# pokemons_obj = json.loads(pokemons, object_hook=lambda d: SimpleNamespace(**d))
-
-# print(pokemons)
-
 graph_json = client.get_graph()
-
 FONT = pygame.font.SysFont('Arial', 20, bold=True)
 graph_json = ast.literal_eval(graph_json)
 graph = GraphAlgo()
 graph = graph.load_from_json(graph_json)
-# get data proportions
-min_x = graph.min_x()
-min_y = graph.min_y()
-max_x = graph.max_x()
-max_y = graph.max_y()
 
 
-#
 def scale(data, min_screen, max_screen, min_data, max_data):
     """
     get the scaled data with proportions min_data, max_data
@@ -66,13 +50,11 @@ def scale(data, min_screen, max_screen, min_data, max_data):
 
 
 # decorate scale with the correct values
-
 def my_scale(data, x=False, y=False):
     if x:
-        return scale(data, 50, screen.get_width() - 50, min_x, max_x)
+        return scale(data, 50, screen.get_width() - 50, graph.min_x(), graph.max_x())
     if y:
-        return scale(data, 50, screen.get_height() - 50, min_y, max_y)
-
+        return scale(data, 50, screen.get_height() - 50, graph.min_y(), graph.max_y())
 
 
 radius = 15
@@ -91,9 +73,12 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 """
 
 while client.is_running() == 'true':
-
+    ######agents into dict####
     agent_dict = json.loads(client.get_agents())
     agent_dict = agent.build_agent(agent_dict)
+    ######pokemons into dict####3
+    pokemon_dict = json.loads(client.get_pokemons())
+    pokemon_dict = pokemon.build_pokemon(pokemon_dict)
     # check events
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -102,14 +87,14 @@ while client.is_running() == 'true':
 
     # refresh surface
     screen.fill([0, 100, 210])
-
+    game = game_display(screen, graph)
     # draw nodes
     for node in graph.get_graph().nodes.values():
         x = my_scale(node.x(), x=True)
         y = my_scale(node.y(), y=True)
         t = (x, y)
         pygame.draw.circle(screen, RGB(40, 40, 40), t, 6)
-    # draw edges
+    #draw edges
     for e in graph.get_graph().nodes.values():
         src_x = e.x()
         src_y = e.y()
@@ -135,26 +120,22 @@ while client.is_running() == 'true':
     for age in agent_dict:
         pos_x = age.x()
         pos_y = age.y()
-        pos_x = my_scale(pos_x , x=True)
+        pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
         pygame.draw.circle(screen, Color(122, 61, 23),
-                           (pos_x,pos_y), 10)
+                           (pos_x, pos_y), 10)
+
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
-    pokemon_dict = json.loads(client.get_pokemons())
-    pokemon_dict = pokemon.build_pokemon(pokemon_dict)
     for p in pokemon_dict:
         pos_x = p.x()
         pos_y = p.y()
-        pos_x = my_scale(pos_x , x=True)
+        pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
-        pygame.draw.circle(screen, Color(0, 255, 255), (pos_x,pos_y), 10)
+        pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
 
 
-    #
-    #
     # update screen changes
     display.update()
-
     # refresh rate
     clock.tick(60)
 
