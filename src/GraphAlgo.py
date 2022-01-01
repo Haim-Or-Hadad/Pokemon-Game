@@ -14,10 +14,10 @@ from src.GraphInterface import GraphInterface
 from src.DiGraph import DiGraph
 from tkinter import filedialog, END, Tk
 
-from src.Node import Node
+from src.Node import *
 import math
 
-#bg = pygame.image.load("nodebook.jpg")
+# bg = pygame.image.load("nodebook.jpg")
 
 WIDTH, HEIGHT = 1080, 720
 
@@ -41,7 +41,7 @@ class GraphAlgo(GraphAlgoInterface):
         """
         my_graph = DiGraph()
         try:
-            #with open(file_name, 'r') as file:
+            # with open(file_name, 'r') as file:
             g_dict = file_name
             for node in g_dict['Nodes']:
                 if "pos" in node:
@@ -49,7 +49,7 @@ class GraphAlgo(GraphAlgoInterface):
                 else:
                     x = random.uniform(32, 33)
                     y = random.uniform(34, 36)
-                    my_graph.add_node(node['id'], (x, y,0))
+                    my_graph.add_node(node['id'], (x, y, 0))
 
             for edge in g_dict['Edges']:
                 my_graph.add_edge(edge["src"], edge["dest"], edge["w"])
@@ -131,7 +131,7 @@ class GraphAlgo(GraphAlgoInterface):
                 min_dist = distance_sum
                 ans = (perm, min_dist)
                 if min_dist == math.inf:
-                    ans = ([],min_dist)
+                    ans = ([], min_dist)
 
         return ans
 
@@ -204,32 +204,29 @@ class GraphAlgo(GraphAlgoInterface):
         pygame.quit()
         sys.exit()
 
-
-
-
-
-
-    def draw_nodes(self, scr , scale):
+    def draw_nodes(self, scr):
         for node in self.graph.nodes.values():
-            x = self.my_scale(node.x(), x=True )
-            y = self.my_scale(node.y(), y=True)
+            x = node.x()
+            y = node.y()
+            x = self.my_scale(x, x=True)
+            y = self.my_scale(y, y=True)
             t = (x, y)
             pygame.draw.circle(scr, RGB(40, 40, 40), t, 6)
 
-    def scale(data, min_screen, max_screen, min_data, max_data):
+    def scale(self, min_screen, max_screen, min_data, max_data):
         """
         get the scaled data with proportions min_data, max_data
         relative to min and max screen dimentions
         """
-        return ((data - min_data) / (max_data - min_data)) * (max_screen - min_screen) + min_screen
+        return ((self - min_data) / (max_data - min_data)) * (max_screen - min_screen) + min_screen
 
     # decorate scale with the correct values
 
-    def my_scale(self, x=False, y=False ):
+    def my_scale(self, x=False, y=False):
         if x:
-            return self.scale(self, 50, WIDTH - 50, self.min_x, self.max_x)
+            return self.scale(self, 50, WIDTH - 50, self.min_x(), self.max_x())
         if y:
-            return self.scale(self, 50, HEIGHT - 50, self.min_y, self.max_y)
+            return self.scale(self, 50, HEIGHT - 50, self.min_y(), self.max_y())
 
     def draw_edges(self, scr):
         for e in self.graph.nodes.values():
@@ -244,16 +241,15 @@ class GraphAlgo(GraphAlgoInterface):
                 dest_x = self.my_scale(dest_x, x=True)
                 dest_y = self.my_scale(dest_y, y=True)
                 # t1,t2 = (src_x, src_y), (dest_x, dest_y)
-                pygame.draw.line(scr, RGB(0,0,0),(src_x, src_y), (dest_x, dest_y), 1)
+                pygame.draw.line(scr, RGB(0, 0, 0), (src_x, src_y), (dest_x, dest_y), 1)
                 rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
-                pygame.draw.polygon(scr, (120,120,130), (
+                pygame.draw.polygon(scr, (120, 120, 130), (
                     (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
                     (
                         dest_x + 15 * math.sin(math.radians(rotation - 158)),
                         dest_y + 15 * math.cos(math.radians(rotation - 158))),
                     (dest_x + 15 * math.sin(math.radians(rotation + 158)),
                      dest_y + 15 * math.cos(math.radians(rotation + 158)))))
-
 
                 # pygame.draw.line(scr, RGB(40, 40, 40),
                 #                  (src_x, src_y), (dest_x, dest_y))
@@ -264,11 +260,10 @@ class GraphAlgo(GraphAlgoInterface):
         pygame.draw.polygon(screen, (255, 0, 0), (
             (end[0] + 20 * math.sin(math.radians(rotation)), end[1] + 20 * math.cos(math.radians(rotation))),
             (
-            end[0] + 20 * math.sin(math.radians(rotation - 120)), end[1] + 20 * math.cos(math.radians(rotation - 120))),
+                end[0] + 20 * math.sin(math.radians(rotation - 120)),
+                end[1] + 20 * math.cos(math.radians(rotation - 120))),
             (end[0] + 20 * math.sin(math.radians(rotation + 120)),
              end[1] + 20 * math.cos(math.radians(rotation + 120)))))
-
-
 
     def min_x(self):
         min_x = sys.maxsize
