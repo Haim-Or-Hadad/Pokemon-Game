@@ -108,7 +108,7 @@ class GraphAlgo(GraphAlgoInterface):
             path.append(curr_node.id)
             tag = curr_node.tag
             curr_node = self.graph.nodes.get(tag)
-        path.append(curr_node.id)
+        #path.append(curr_node.id)
         path.reverse()
         return weight, path
 
@@ -254,16 +254,16 @@ class GraphAlgo(GraphAlgoInterface):
                 # pygame.draw.line(scr, RGB(40, 40, 40),
                 #                  (src_x, src_y), (dest_x, dest_y))
 
-    def draw_arrow(self, screen, colour, start, end):
-        pygame.draw.line(screen, colour, start, end, 2)
-        rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
-        pygame.draw.polygon(screen, (255, 0, 0), (
-            (end[0] + 20 * math.sin(math.radians(rotation)), end[1] + 20 * math.cos(math.radians(rotation))),
-            (
-                end[0] + 20 * math.sin(math.radians(rotation - 120)),
-                end[1] + 20 * math.cos(math.radians(rotation - 120))),
-            (end[0] + 20 * math.sin(math.radians(rotation + 120)),
-             end[1] + 20 * math.cos(math.radians(rotation + 120)))))
+    # def draw_arrow(self, screen, colour, start, end):
+    #     pygame.draw.line(screen, colour, start, end, 2)
+    #     rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
+    #     pygame.draw.polygon(screen, (255, 0, 0), (
+    #         (end[0] + 20 * math.sin(math.radians(rotation)), end[1] + 20 * math.cos(math.radians(rotation))),
+    #         (
+    #             end[0] + 20 * math.sin(math.radians(rotation - 120)),
+    #             end[1] + 20 * math.cos(math.radians(rotation - 120))),
+    #         (end[0] + 20 * math.sin(math.radians(rotation + 120)),
+    #          end[1] + 20 * math.cos(math.radians(rotation + 120)))))
 
     def min_x(self):
         min_x = sys.maxsize

@@ -7,6 +7,8 @@ class pokemon():
         self.type = type
         self.pos = pos
 
+
+
     def x(self):
         if type(self.pos) == tuple:
             return float(self.pos[0])

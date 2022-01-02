@@ -10,7 +10,7 @@ import json
 import pygame
 from pygame import *
 import math
-
+from catch_algo import *
 from game_display import *
 from client_python.pokemon import pokemon
 from src.GraphAlgo import GraphAlgo
@@ -23,7 +23,6 @@ WIDTH, HEIGHT = 1080, 720
 PORT = 6666
 # server host (default localhost 127.0.0.1)
 HOST = '127.0.0.1'
-
 
 pygame.init()
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
@@ -93,8 +92,11 @@ while client.is_running() == 'true':
         x = my_scale(node.x(), x=True)
         y = my_scale(node.y(), y=True)
         t = (x, y)
+        t1= (x+1,y+1.80)
+        id_1 = FONT.render(str(node.id), False, RGB(40, 40, 40))
+        screen.blit(id_1, t1)
         pygame.draw.circle(screen, RGB(40, 40, 40), t, 6)
-    #draw edges
+    # draw edges
     for e in graph.get_graph().nodes.values():
         src_x = e.x()
         src_y = e.y()
@@ -107,14 +109,14 @@ while client.is_running() == 'true':
             dest_x = my_scale(dest_x, x=True)
             dest_y = my_scale(dest_y, y=True)
             pygame.draw.line(screen, RGB(0, 0, 0), (src_x, src_y), (dest_x, dest_y), 1)
-            rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
-            pygame.draw.polygon(screen, (120, 120, 130), (
-                (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
-                (
-                    dest_x + 15 * math.sin(math.radians(rotation - 158)),
-                    dest_y + 15 * math.cos(math.radians(rotation - 158))),
-                (dest_x + 15 * math.sin(math.radians(rotation + 158)),
-                 dest_y + 15 * math.cos(math.radians(rotation + 158)))))
+            # rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
+            # pygame.draw.polygon(screen, (120, 120, 130), (
+            #     (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
+            #     (
+            #         dest_x + 15 * math.sin(math.radians(rotation - 158)),
+            #         dest_y + 15 * math.cos(math.radians(rotation - 158))),
+            #     (dest_x + 15 * math.sin(math.radians(rotation + 158)),
+            #      dest_y + 15 * math.cos(math.radians(rotation + 158)))))
 
     # draw agents
     for age in agent_dict:
@@ -133,20 +135,13 @@ while client.is_running() == 'true':
         pos_y = my_scale(pos_y, y=True)
         pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
 
-
     # update screen changes
     display.update()
     # refresh rate
     clock.tick(60)
 
     # choose next edge
-    for agent1 in agent_dict:
-        if agent1.dest == -1:
-            next_node = (agent1.src - 1) % len(graph.get_graph().nodes)
-            client.choose_next_edge(
-                '{"agent_id":' + str(agent1.id) + ', "next_node_id":' + str(next_node) + '}')
-            ttl = client.time_to_end()
-            print(ttl, client.get_info())
+    catch = catch_algo(graph, client)
+    catch.send_agent(agent_dict, pokemon_dict)
 
-    client.move()
 # game over:
