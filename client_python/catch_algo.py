@@ -20,28 +20,36 @@ class Catch_Algo:
         flag = 1
         for ag in agent_list:
             for po in pokemon_list:
-                if ag.dest == -1:
-                    positions = self.pos_dict()
-                    close_pokemon_id = self.closest_node(po.pos, positions)
-                    print("last:", ag.last_item())
-                    print(close_pokemon_id)
-                    s_path = self.game_graph.shortest_path(ag.last_item(), close_pokemon_id)
-                    print("shortest_path", s_path)
-                    ag.update_path(s_path, close_pokemon_id)  # add the new path to queue
-                    next_node = ag.show_path()
-                    if next_node == ag.src:
-                        ag.remove_element()
+                if po.status == 0:
+                    if ag.dest == -1:
+                        positions = self.pos_dict()
+                        close_pokemon_id = self.closest_node(po.pos, positions)
+                        print("last:", ag.last_item())
+                        print(close_pokemon_id)
+                        edge = self.on_edge(close_pokemon_id, po.pos)
+                        s_path = self.game_graph.shortest_path(ag.last_item(), close_pokemon_id)
+
+                        print("shortest_path", s_path)
+                        ag.update_path(s_path, edge[1])  # add the new path to queue
                         next_node = ag.show_path()
-                        self.client.choose_next_edge(
-                            '{"agent_id":' + str(ag.id) + ', "next_node_id":' + str(next_node) + '}')
+                        if next_node == ag.src:
+                            ag.remove_element()
+                            next_node = ag.show_path()
+                            self.client.choose_next_edge(
+                                '{"agent_id":' + str(ag.id) + ', "next_node_id":' + str(next_node) + '}')
 
-                    print("next node:", next_node)
+                        if next_node <= ag.show_path():
+                            ag.update_der("RIGHT")
+                        else:
+                            ag.update_der("LEFT")
+                        po.update_poke_status(1)
+                        print("next node:", next_node)
 
-                    print("src:", ag.src)
-                    print("dest:", ag.dest)
-                    ttl = self.client.time_to_end()
-                    print(ttl, self.client.get_info())
-        self.client.move()
+                        print("src:", ag.src)
+                        print("dest:", ag.dest)
+                        ttl = self.client.time_to_end()
+                        print(ttl, self.client.get_info())
+                    self.client.move()
 
     def closest_node(self, poke_pos, nodes):
         min = math.inf

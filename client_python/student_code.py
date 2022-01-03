@@ -70,7 +70,7 @@ client.start()
 The code below should be improved significantly:
 The GUI and the "algo" are mixed - refactoring using MVC design pattern is required.
 """
-
+first_time=0
 while client.is_running() == 'true':
     ######agents into dict####
     agent_dict = json.loads(client.get_agents())

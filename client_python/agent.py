@@ -4,6 +4,7 @@ from queue import PriorityQueue
 class Agent:
     agent_path = [0]
     last_dest = 0
+    Direction = None
 
     def __init__(self, id: int, value: float, src: int, dest: int, speed: float, pos: tuple):
         self.id = id
@@ -15,14 +16,23 @@ class Agent:
 
     def last_item(self):
         if len(self.agent_path) > 0:
-            return self.agent_path[len(self.agent_path)-1]
+            return self.agent_path[len(self.agent_path) - 1]
+
+    def update_der(self, dir):
+        self.Direction = dir
 
     def update_path(self, short_path: list, id2: int):
         for n in short_path:
-            if n not in self.agent_path:
+            if self.Direction == None:
                 self.agent_path.append(n)
-        # if id2 not in self.agent_path:
-        # self.agent_path.append(id2)
+            elif n > self.src and self.Direction == "RIGHT":
+                if n not in self.agent_path:
+                    self.agent_path.append(n)
+            elif n < self.src and self.Direction == "LEFT":
+                if n not in self.agent_path:
+                    self.agent_path.append(n)
+        if id2 not in self.agent_path:
+            self.agent_path.append(id2)
         print(self.agent_path)
 
     def show_path(self):
