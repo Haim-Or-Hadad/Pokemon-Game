@@ -3,6 +3,7 @@ from queue import PriorityQueue
 
 class agent():
     agent_path = []
+    last_dest = 0
 
     def __init__(self, id: int, value: float, src: int, dest: int, speed: float, pos: tuple):
         self.id = id
@@ -12,17 +13,29 @@ class agent():
         self.speed = speed
         self.pos = pos
 
-    def update_path(self, short_path:list,id2:int):
+    def update_path(self, short_path: list, id2: int):
         for n in short_path:
             if n not in self.agent_path:
                 self.agent_path.append(n)
-        if id2 not in self.agent_path:
-            self.agent_path.append(id2)
+        #if id2 not in self.agent_path:
+            #self.agent_path.append(id2)
         print(self.agent_path)
 
+    def show_path(self):
+        if len(self.agent_path) > 0:
+            return self.agent_path[0]
+
+    def path_size(self):
+        return len(self.agent_path)
+
     def get_path(self):
-        if  len(self.agent_path)>0:
+        if len(self.agent_path) > 0:
+            if self.last_dest == self.agent_path[0]:
+                self.last_dest = self.agent_path[0]
+                self.agent_path.pop(0)
             return self.agent_path.pop(0)
+        else :
+            return 3
 
     def x(self):
         if type(self.pos) == tuple:

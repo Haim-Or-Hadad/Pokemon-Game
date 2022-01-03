@@ -19,14 +19,22 @@ class catch_algo:
         then we take the position of the pokemon and check the shortest
         path between the src/dest of agent to src/dest of pokemon.
         """
+        flag = 1
         for ag in agent_list:
             if ag.dest == -1:
                 for po in pokemon_list:
                     positions = self.pos_dict()
                     closest_nodeID = self.closest_node(po.pos, positions)
-                    s_path = self.game_graph.shortest_path(ag.src, closest_nodeID[0])
-                    ag.update_path(s_path[1],closest_nodeID[1])
+                    if flag == 1:
+                        s_path = self.game_graph.shortest_path(ag.src, closest_nodeID[0])
+                        flag = 0
+                    else:
+                        s_path = self.game_graph.shortest_path(ag.show_path() , closest_nodeID[0])
+                    ag.update_path(s_path[1],closest_nodeID[1]) #add the new path to queue
                     next_node = ag.get_path()
+                    print("next node:", ag.dest)
+                    print("src:",ag.src)
+                    print("dest:",ag.dest)
                     # next_node = (agent1.src - 1) % len(self.game_graph.get_graph().nodes)
                     self.client.choose_next_edge(
                         '{"agent_id":' + str(ag.id) + ', "next_node_id":' + str(next_node) + '}')
@@ -34,6 +42,7 @@ class catch_algo:
                     print(ttl, self.client.get_info())
 
             self.client.move()
+
 
 
     def closest_node(self, poke_pos, nodes):
