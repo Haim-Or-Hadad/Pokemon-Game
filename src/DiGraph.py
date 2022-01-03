@@ -1,8 +1,7 @@
 from src.Node import Node
-from src.GraphInterface import GraphInterface
 
 
-class DiGraph(GraphInterface):
+class DiGraph():
     def __init__(self, **kwargs):
         self.nodes = dict()
         self.num_of_edge = 0

@@ -14,7 +14,7 @@ from catch_algo import *
 from game_display import *
 from client_python.pokemon import pokemon
 from src.GraphAlgo import GraphAlgo
-from client_python.agent import agent
+from client_python.agent import Agent
 
 # init pygame
 WIDTH, HEIGHT = 1080, 720
@@ -74,7 +74,7 @@ The GUI and the "algo" are mixed - refactoring using MVC design pattern is requi
 while client.is_running() == 'true':
     ######agents into dict####
     agent_dict = json.loads(client.get_agents())
-    agent_dict = agent.build_agent(agent_dict)
+    agent_dict = Agent.build_agent(agent_dict)
     ######pokemons into dict####3
     pokemon_dict = json.loads(client.get_pokemons())
     pokemon_dict = pokemon.build_pokemon(pokemon_dict)
@@ -127,6 +127,7 @@ while client.is_running() == 'true':
         pygame.draw.circle(screen, Color(122, 61, 23),
                            (pos_x, pos_y), 10)
 
+
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
     for p in pokemon_dict:
         pos_x = p.x()
@@ -141,7 +142,8 @@ while client.is_running() == 'true':
     clock.tick(60)
 
     # choose next edge
-    catch = catch_algo(graph, client)
+    catch = Catch_Algo(graph, client)
+
     catch.send_agent(agent_dict, pokemon_dict)
 
 # game over:

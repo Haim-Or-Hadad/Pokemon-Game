@@ -4,7 +4,7 @@ import os
 
 class Node:
 
-    def __init__(self, id: int, pos: tuple = None, **kwargs):
+    def __init__(self, id: int, pos: tuple = None):
         """
         pos: the position of nodes in space.
         id: node's key
@@ -56,7 +56,8 @@ class Node:
         return node's position
         :return:pos
         """
-        return self.pos
+        pos = list(self.pos.split(","))
+        return pos
 
     def get_tag(self):
         return self.tag

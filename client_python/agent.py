@@ -1,8 +1,8 @@
 from queue import PriorityQueue
 
 
-class agent():
-    agent_path = []
+class Agent:
+    agent_path = [0]
     last_dest = 0
 
     def __init__(self, id: int, value: float, src: int, dest: int, speed: float, pos: tuple):
@@ -13,12 +13,16 @@ class agent():
         self.speed = speed
         self.pos = pos
 
+    def last_item(self):
+        if len(self.agent_path) > 0:
+            return self.agent_path[len(self.agent_path)-1]
+
     def update_path(self, short_path: list, id2: int):
         for n in short_path:
             if n not in self.agent_path:
                 self.agent_path.append(n)
-        #if id2 not in self.agent_path:
-            #self.agent_path.append(id2)
+        # if id2 not in self.agent_path:
+        # self.agent_path.append(id2)
         print(self.agent_path)
 
     def show_path(self):
@@ -34,8 +38,9 @@ class agent():
                 self.last_dest = self.agent_path[0]
                 self.agent_path.pop(0)
             return self.agent_path.pop(0)
-        else :
-            return 3
+
+    def remove_element(self):
+        self.agent_path.pop(0)
 
     def x(self):
         if type(self.pos) == tuple:
@@ -59,7 +64,7 @@ class agent():
         agent_list = []
         for a in agents['Agents']:  # O(1)
             for _, i in a.items():
-                curr_agent = agent(i['id'], i['value'],
+                curr_agent = Agent(i['id'], i['value'],
                                    i['src'], i['dest'],
                                    i['speed'], i['pos'])
                 agent_list.append(curr_agent)

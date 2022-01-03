@@ -17,6 +17,7 @@ class Client:
         to start a new connection to the game server
         """
         self.soc = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
         self.soc.connect((ip, port))
 
     def __send_message(self, msg):

@@ -9,8 +9,6 @@ from typing import List
 from easygui import *
 import pygame
 import pygame as pg
-from src.GraphAlgoInterface import GraphAlgoInterface
-from src.GraphInterface import GraphInterface
 from src.DiGraph import DiGraph
 from tkinter import filedialog, END, Tk
 
@@ -22,12 +20,12 @@ import math
 WIDTH, HEIGHT = 1080, 720
 
 
-class GraphAlgo(GraphAlgoInterface):
+class GraphAlgo():
 
     def __init__(self, graph: DiGraph = DiGraph()):
         self.graph = graph
 
-    def get_graph(self) -> GraphInterface:
+    def get_graph(self) -> DiGraph:
         """
         :return: the directed graph on which the algorithm works on.
         """
@@ -87,7 +85,7 @@ class GraphAlgo(GraphAlgoInterface):
             return False
         return True
 
-    def shortest_path(self, id1: int, id2: int) -> (float, list):
+    def shortest_path(self, id1: int, id2: int) -> (list):
         """
         Returns the shortest path from node id1 to node id2 using Dijkstra's Algorithm
         @param id1: The start node id
@@ -108,9 +106,10 @@ class GraphAlgo(GraphAlgoInterface):
             path.append(curr_node.id)
             tag = curr_node.tag
             curr_node = self.graph.nodes.get(tag)
-        #path.append(curr_node.id)
+
+        # path.append(curr_node.id)
         path.reverse()
-        return weight, path
+        return path
 
     def TSP(self, node_lst: List[int]) -> (List[int], float):
         """
@@ -150,16 +149,21 @@ class GraphAlgo(GraphAlgoInterface):
 
         return t
 
-    def plot_graph(self) -> None:
-        """
-        Plots the graph.
-        If the nodes have a position, the nodes will be placed there.
-        Otherwise, they will be placed in a random but elegant manner.
-        @return: None
-        """
-        # gui = GUI(self)
-        # gui.gui()
-        self.gui()
+    def distance(self, pos1, pos2):
+
+        dist = ((float(pos1[0]) - float(pos2[0])) ** 2 + (
+                float(pos1[1]) - float(pos2[1])) ** 2) ** 0.5
+        return dist
+
+    def isonedge(self, poke: tuple, src: int, dest: int):
+        n1 = self.graph.nodes.get(src).pos
+        n2 = self.graph.nodes.get(dest).pos
+        src_dest = self.distance(n1, n2)
+        src_poke=self.distance(n1,poke)
+        if(src_dest>src_poke):
+            return 1
+        else:
+            return 0
 
     def rest_tag_weight(self):
         for node in self.graph.nodes.values():
@@ -185,24 +189,6 @@ class GraphAlgo(GraphAlgoInterface):
         for node in self.graph.nodes.values():
             if node.weight > self.graph.nodes.get(src).max_weight:
                 self.graph.nodes.get(src).max_weight = node.weight
-
-    def gui(self):
-        pygame.init()
-        scr = pygame.display.set_mode((900, 600))
-        pygame.font.init()
-        FONT = pygame.font.SysFont('Our Graph', 20, bold=True)
-        run = True
-        while run:
-            for e in pygame.event.get():
-                if e.type == pygame.QUIT:
-                    run = False
-                scr.blit(bg, (0, 0))
-            self.draw_nodes(scr)
-            self.draw_edges(scr)
-            pygame.display.update()
-
-        pygame.quit()
-        sys.exit()
 
     def draw_nodes(self, scr):
         for node in self.graph.nodes.values():
