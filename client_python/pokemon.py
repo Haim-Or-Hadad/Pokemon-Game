@@ -2,11 +2,27 @@
 
 class pokemon():
     status=0
+    src=0
+    dest=0
+
     def __init__(self, value: int, type: int, pos : tuple):
         self.value = value
         self.type = type
         self.pos = pos
 
+    def pokemon_edge(self,id1_id2):
+        if id1_id2[0]>=id1_id2[1]:
+            src=id1_id2[1]
+            dest=id1_id2[0]
+        else:
+            src=id1_id2[0]
+            dest=id1_id2[1]
+        if self.type>0: #src<dest
+            self.src=src
+            self.dest=dest
+        else:
+            self.src=dest
+            self.dest=src
 
 
     def x(self):

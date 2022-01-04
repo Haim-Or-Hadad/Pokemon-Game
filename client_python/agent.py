@@ -2,9 +2,6 @@ from queue import PriorityQueue
 
 
 class Agent:
-    agent_path = [0]
-    last_dest = 0
-    Direction = None
 
     def __init__(self, id: int, value: float, src: int, dest: int, speed: float, pos: tuple):
         self.id = id
@@ -13,6 +10,9 @@ class Agent:
         self.dest = dest
         self.speed = speed
         self.pos = pos
+        self.agent_path = [self.src]
+        self.last_dest = 0
+        self.Direction = None
 
     def last_item(self):
         if len(self.agent_path) > 0:
@@ -21,9 +21,9 @@ class Agent:
     def update_der(self, dir):
         self.Direction = dir
 
-    def update_path(self, short_path: list, id2: int):
+    def update_path(self, short_path: list, po):
         for n in short_path:
-            if self.Direction == None:
+            if self.Direction is None:
                 self.agent_path.append(n)
             elif n > self.src and self.Direction == "RIGHT":
                 if n not in self.agent_path:
@@ -31,13 +31,19 @@ class Agent:
             elif n < self.src and self.Direction == "LEFT":
                 if n not in self.agent_path:
                     self.agent_path.append(n)
-        if id2 not in self.agent_path:
-            self.agent_path.append(id2)
-        print(self.agent_path)
+        if self.Direction is None:
+            self.agent_path.append(po.dest)
+        if po.src <= po.dest and po.dest not in self.agent_path and self.Direction == "LEFT":
+            self.agent_path.append(po.dest)
+        if po.src >= po.dest and po.dest not in self.agent_path and self.Direction == "RIGHT":
+            self.agent_path.append(po.dest)
 
     def show_path(self):
         if len(self.agent_path) > 0:
             return self.agent_path[0]
+
+    def print_path(self):
+        print("Agent path: ",str(self.agent_path)[1:-1])
 
     def path_size(self):
         return len(self.agent_path)
@@ -79,3 +85,13 @@ class Agent:
                                    i['speed'], i['pos'])
                 agent_list.append(curr_agent)
         return agent_list
+
+    def update_agent_dict(agent_list: dict, from_server: dict):
+        for a in from_server['Agents']:
+            for _, i in a.items():
+                A_id = int(i['id'])
+                agent_list[A_id].value = i['value']
+                agent_list[A_id].src = i['src']
+                agent_list[A_id].dest = i['dest']
+                agent_list[A_id].speed = i['speed']
+                agent_list[A_id].pos = i['pos']

@@ -23,7 +23,7 @@ WIDTH, HEIGHT = 1080, 720
 PORT = 6666
 # server host (default localhost 127.0.0.1)
 HOST = '127.0.0.1'
-
+count = 0
 pygame.init()
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
 clock = pygame.time.Clock()
@@ -70,11 +70,13 @@ client.start()
 The code below should be improved significantly:
 The GUI and the "algo" are mixed - refactoring using MVC design pattern is required.
 """
-first_time=0
+first_time = 0
+######agents into dict####
+agent_dict1 = json.loads(client.get_agents())
+agent_dict = Agent.build_agent(agent_dict1)
 while client.is_running() == 'true':
-    ######agents into dict####
-    agent_dict = json.loads(client.get_agents())
-    agent_dict = Agent.build_agent(agent_dict)
+    agent_dict1 = json.loads(client.get_agents())
+    Agent.update_agent_dict(agent_dict, agent_dict1)
     ######pokemons into dict####3
     pokemon_dict = json.loads(client.get_pokemons())
     pokemon_dict = pokemon.build_pokemon(pokemon_dict)
@@ -92,7 +94,7 @@ while client.is_running() == 'true':
         x = my_scale(node.x(), x=True)
         y = my_scale(node.y(), y=True)
         t = (x, y)
-        t1= (x+1,y+1.80)
+        t1 = (x + 1, y + 1.80)
         id_1 = FONT.render(str(node.id), False, RGB(40, 40, 40))
         screen.blit(id_1, t1)
         pygame.draw.circle(screen, RGB(40, 40, 40), t, 6)
@@ -127,7 +129,6 @@ while client.is_running() == 'true':
         pygame.draw.circle(screen, Color(122, 61, 23),
                            (pos_x, pos_y), 10)
 
-
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
     for p in pokemon_dict:
         pos_x = p.x()
@@ -140,10 +141,15 @@ while client.is_running() == 'true':
     display.update()
     # refresh rate
     clock.tick(60)
-
-    # choose next edge
-    catch = Catch_Algo(graph, client)
-
-    catch.send_agent(agent_dict, pokemon_dict)
+    if count == 180:
+        catch = Catch_Algo(graph, client)
+        check = client.get_info()
+        catch.send_agent(agent_dict, pokemon_dict)
+    # choose next
+    else:
+        catch = Catch_Algo(graph, client)
+        check = client.get_info()
+        catch.send_agent(agent_dict, pokemon_dict)
+    count += 1
 
 # game over:
