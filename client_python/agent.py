@@ -31,12 +31,8 @@ class Agent:
             elif n < self.src and self.Direction == "LEFT":
                 if n not in self.agent_path:
                     self.agent_path.append(n)
-        if self.Direction is None:
-            self.agent_path.append(po.dest)
-        if po.src <= po.dest and po.dest not in self.agent_path and self.Direction == "LEFT":
-            self.agent_path.append(po.dest)
-        if po.src >= po.dest and po.dest not in self.agent_path and self.Direction == "RIGHT":
-            self.agent_path.append(po.dest)
+        if po not in self.agent_path:
+             self.agent_path.append(po)
 
     def show_path(self):
         if len(self.agent_path) > 0:
