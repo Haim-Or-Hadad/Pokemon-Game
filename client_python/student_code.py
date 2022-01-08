@@ -163,7 +163,7 @@ while client.is_running() == 'true':
             pok_image = pygame.transform.scale(pok_image, (50, 30))
             screen.blit(pok_image,(pos_x, pos_y))
 
-        if 8 < p.value :
+        if 8 <= p.value :
             pok_image = pygame.image.load("pokemons_logo\mu.png")
             pok_image = pygame.transform.scale(pok_image, (50, 30))
             screen.blit(pok_image,(pos_x, pos_y))
