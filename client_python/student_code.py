@@ -5,6 +5,10 @@ Very simple GUI example for python client to communicates with the server and "p
 """
 import ast
 from ctypes.wintypes import RGB
+
+from pygame import display
+from pygame.color import Color
+
 from client import Client
 import json
 import pygame
@@ -19,6 +23,9 @@ from client_python.agent import Agent
 # init pygame
 WIDTH, HEIGHT = 1080, 720
 
+#background
+img = pygame.image.load("pokemons_logo/pokemon_sea.jpg")
+img = pygame.transform.scale(img,(1080, 720))
 # default port
 PORT = 6666
 # server host (default localhost 127.0.0.1)
@@ -26,9 +33,11 @@ HOST = '127.0.0.1'
 count = 0
 pygame.init()
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
+pygame.display.set_caption('Resizable')
 clock = pygame.time.Clock()
 pygame.font.init()
-screen.fill([0, 100, 210])
+# screen.fill([0, 100, 210])
+screen.blit(img, (1080, 720))
 pygame.display.update()
 client = Client()
 client.start_connection(HOST, PORT)
@@ -87,7 +96,10 @@ while client.is_running() == 'true':
             exit(0)
 
     # refresh surface
-    screen.fill([0, 100, 210])
+    img = pygame.transform.scale(img, (screen.get_width(), screen.get_height()))
+    screen.blit(img, (0,0))
+
+    # screen.fill([0, 100, 210])
     game = game_display(screen, graph)
     # draw nodes
     for node in graph.get_graph().nodes.values():
@@ -95,9 +107,10 @@ while client.is_running() == 'true':
         y = my_scale(node.y(), y=True)
         t = (x, y)
         t1 = (x + 1, y + 1.80)
-        id_1 = FONT.render(str(node.id), False, RGB(40, 40, 40))
+        id_1 = FONT.render(str(node.id), False, RGB(25, 212, 120))
         screen.blit(id_1, t1)
-        pygame.draw.circle(screen, RGB(40, 40, 40), t, 6)
+
+        pygame.draw.circle(screen, RGB(118, 149, 195), t, 6)
     # draw edges
     for e in graph.get_graph().nodes.values():
         src_x = e.x()
@@ -110,7 +123,7 @@ while client.is_running() == 'true':
             dest_y = graph.get_graph().nodes.get(edge).y()
             dest_x = my_scale(dest_x, x=True)
             dest_y = my_scale(dest_y, y=True)
-            pygame.draw.line(screen, RGB(0, 0, 0), (src_x, src_y), (dest_x, dest_y), 1)
+            pygame.draw.line(screen, RGB(160, 27, 195), (src_x, src_y), (dest_x, dest_y), 3)
             # rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
             # pygame.draw.polygon(screen, (120, 120, 130), (
             #     (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
@@ -135,21 +148,42 @@ while client.is_running() == 'true':
         pos_y = p.y()
         pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
-        pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
+        if 0 < p.value < 3:
+            pok_image = pygame.image.load("pokemons_logo\weak_pokemon.png")
+            pok_image = pygame.transform.scale(pok_image, (50, 30))
+            screen.blit(pok_image,(pos_x, pos_y))
+
+        if 3 <= p.value <= 5:
+            pok_image = pygame.image.load("pokemons_logo\midium_pokemon.png")
+            pok_image = pygame.transform.scale(pok_image, (50, 30))
+            screen.blit(pok_image,(pos_x, pos_y))
+
+        if 5 < p.value <= 7:
+            pok_image = pygame.image.load("pokemons_logo\pikacho-modified.png")
+            pok_image = pygame.transform.scale(pok_image, (50, 30))
+            screen.blit(pok_image,(pos_x, pos_y))
+
+        if 8 < p.value :
+            pok_image = pygame.image.load("pokemons_logo\mu.png")
+            pok_image = pygame.transform.scale(pok_image, (50, 30))
+            screen.blit(pok_image,(pos_x, pos_y))
+
+        #pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
 
     # update screen changes
     display.update()
     # refresh rate
-    clock.tick(60)
-    if count == 180:
-        catch = Catch_Algo(graph, client)
+    clock.tick(10)
+    if count == 60:
+        catch = catch_algo(graph, client)
         check = client.get_info()
         catch.send_agent(agent_dict, pokemon_dict)
     # choose next
     else:
-        catch = Catch_Algo(graph, client)
+        catch = catch_algo(graph, client)
         check = client.get_info()
         catch.send_agent(agent_dict, pokemon_dict)
+        client.move()
     count += 1
 
 # game over:

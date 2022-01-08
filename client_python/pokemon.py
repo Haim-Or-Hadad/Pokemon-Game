@@ -62,3 +62,6 @@ class pokemon():
 
     def __repr__(self):
         return f"pos:{str(self.pos)[1:-1]}\n"
+
+    def __le__(self,other):
+        return self.value == other.value or self.value < other.value

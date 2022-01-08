@@ -109,7 +109,7 @@ class GraphAlgo():
 
         # path.append(curr_node.id)
         path.reverse()
-        return path
+        return weight,path
 
     def TSP(self, node_lst: List[int]) -> (List[int], float):
         """

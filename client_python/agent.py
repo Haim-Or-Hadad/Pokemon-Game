@@ -23,19 +23,15 @@ class Agent:
 
     def update_path(self, short_path: list, po):
         for n in short_path:
-            if self.Direction is None:
-                self.agent_path.append(n)
-            elif n > self.src and self.Direction == "RIGHT":
-                if n not in self.agent_path:
-                    self.agent_path.append(n)
-            elif n < self.src and self.Direction == "LEFT":
-                if n not in self.agent_path:
-                    self.agent_path.append(n)
-        if self.Direction is None:
-            self.agent_path.append(po.dest)
-        if po.src <= po.dest and po.dest not in self.agent_path and self.Direction == "LEFT":
-            self.agent_path.append(po.dest)
-        if po.src >= po.dest and po.dest not in self.agent_path and self.Direction == "RIGHT":
+            #if n not in self.agent_path:
+            self.agent_path.append(n)
+        # if self.Direction is None:
+        #     self.agent_path.append(po.dest)
+        # if po.src <= po.dest and po.dest not in self.agent_path and self.Direction == "LEFT":
+        #     self.agent_path.append(po.dest)
+        # if po.src >= po.dest and po.dest not in self.agent_path and self.Direction == "RIGHT":
+        #     self.agent_path.append(po.dest)
+        if po.dest not in self.agent_path:
             self.agent_path.append(po.dest)
 
     def show_path(self):
@@ -43,7 +39,7 @@ class Agent:
             return self.agent_path[0]
 
     def print_path(self):
-        print("Agent path: ",str(self.agent_path)[1:-1])
+        print("Agent path: ", str(self.agent_path)[1:-1])
 
     def path_size(self):
         return len(self.agent_path)
