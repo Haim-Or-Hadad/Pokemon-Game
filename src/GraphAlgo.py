@@ -155,15 +155,6 @@ class GraphAlgo():
                 float(pos1[1]) - float(pos2[1])) ** 2) ** 0.5
         return dist
 
-    def isonedge(self, poke: tuple, src: int, dest: int):
-        n1 = self.graph.nodes.get(src).pos
-        n2 = self.graph.nodes.get(dest).pos
-        src_dest = self.distance(n1, n2)
-        src_poke=self.distance(n1,poke)
-        if(src_dest>src_poke):
-            return 1
-        else:
-            return 0
 
     def rest_tag_weight(self):
         for node in self.graph.nodes.values():

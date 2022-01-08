@@ -4,6 +4,8 @@ from client_python.client import Client
 from src.GraphAlgo import GraphAlgo
 from agent import *
 
+EPS = 0.000000001
+
 
 class catch_algo:
     pokemon_curr_list = []
@@ -19,8 +21,7 @@ class catch_algo:
         positions = self.pos_dict()
         dist_list = []
         for po in pokemon_list:
-            close_pokemon_id = self.closest_node(po.pos, positions)
-            edge = self.on_edge(close_pokemon_id, po.pos)
+            edge = self.on_edge(po.pos)
             po.pokemon_edge(edge)
             dist = self.game_graph.shortest_path(ag.src, po.dest)[0]
             dist = dist / po.value
@@ -49,12 +50,9 @@ class catch_algo:
                 po = priority_poke.get()[1]
                 if po.status == 0:
                     if ag.dest == -1:
-                        positions = self.pos_dict()
-                        close_pokemon_id = self.closest_node(po.pos, positions)
-                        print(close_pokemon_id)
-                        edge = self.on_edge(close_pokemon_id, po.pos)
+                        edge = self.on_edge(po.pos)
                         po.pokemon_edge(edge)
-                        s_path = self.game_graph.shortest_path(ag.last_item(), edge[0])[1]
+                        s_path = self.game_graph.shortest_path(ag.last_item(), po.src)[1]
                         print("shortest_path", s_path)
                         print("agent list:", ag.agent_path)
                         if ag.src == ag.last_item() or ag.path_size() == 1:
@@ -72,7 +70,9 @@ class catch_algo:
                         print("dest:", ag.dest)
                         ttl = self.client.time_to_end()
                         print(ttl, self.client.get_info())
-        self.client.move()
+                        #if flag==1:
+            self.client.move()
+                            #flag+=1
 
     def load_curr_pokemons(self, pokemon_list: list):
 
@@ -91,43 +91,15 @@ class catch_algo:
             front = self.pokemon_curr_list.pop(0)
             self.pokemon_curr_list.append(front)
 
-    def closest_node(self, poke_pos, nodes):
-        min = math.inf
-        min2 = math.inf
-        id2 = 99
-        id = 99
-        poke_pos = list(poke_pos.split(","))
-        for n in nodes.keys():
-            node_corr = list(nodes.get(n).split(","))
-            dist = ((float(poke_pos[0]) - float(node_corr[0])) ** 2 + (
-                    float(poke_pos[1]) - float(node_corr[1])) ** 2) ** 0.5
-            if dist < min:
-                min2 = min
-                id2 = id
-                min = dist
-                id = n
-        return id
-
-    def on_edge(self, src, poke):
+    def on_edge(self, poke):
         poke = list(poke.split(","))
-        src = self.game_graph.graph.nodes.get(src)
-        shortest = {}
-        src_poke_dist = self.game_graph.distance(src.get_pos(), poke)
-        edge_list = self.game_graph.graph.all_out_edges_of_node(src.id)
-        for dest in edge_list:
-            dest = self.game_graph.graph.nodes.get(dest)
-            curr_dist = self.game_graph.distance(poke, dest.get_pos())
-            total_dist = self.game_graph.distance(src.get_pos(), dest.get_pos())
-            shortest[dest] = total_dist - (src_poke_dist + curr_dist)
-            # if total_dist >= (src_poke_dist + curr_dist - 0.01):
-        min = -9999
-        dest_id = 0
-        for n in shortest:
-            if shortest.get(n) > min:
-                min = shortest.get(n)
-                dest_id = n.id
-
-        return src.id, dest_id
+        for node1 in self.game_graph.graph.nodes.values():
+            for node2 in self.game_graph.graph.nodes.values():
+                curr_src_dest = self.game_graph.distance(node1.get_pos(), node2.get_pos())
+                src_poke = self.game_graph.distance(node1.get_pos(), poke)
+                dest_poke = self.game_graph.distance(node2.get_pos(), poke)
+                if abs(curr_src_dest - (src_poke + dest_poke)) <= EPS:
+                    return node1.id, node2.id
 
     def pos_dict(self):
         pos_dict = {}

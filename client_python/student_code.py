@@ -69,8 +69,8 @@ radius = 15
 
 client.add_agent("{\"id\":0}")
 client.add_agent("{\"id\":1}")
-# client.add_agent("{\"id\":2}")
-# client.add_agent("{\"id\":3}")
+client.add_agent("{\"id\":2}")
+client.add_agent("{\"id\":3}")
 
 # this commnad starts the server - the game is running now
 client.start()
@@ -170,11 +170,23 @@ while client.is_running() == 'true':
 
         #pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
 
+    ####Timer and score####
+    info=json.loads(client.get_info())
+    score=info['GameServer']['grade']
+    moves=info['GameServer']['moves']
+    time=client.time_to_end()
+    score_x=32
+    score_y=34
+    score_x = my_scale(score_x, x=True)
+    score_y = my_scale(score_y, y=True)
+    score = FONT.render(str(score), False, RGB(25, 212, 120))
+    screen.blit(score,(score_x,score_y))
+
     # update screen changes
     display.update()
     # refresh rate
     clock.tick(10)
-    if count == 60:
+    if count == 335:
         catch = catch_algo(graph, client)
         check = client.get_info()
         catch.send_agent(agent_dict, pokemon_dict)
