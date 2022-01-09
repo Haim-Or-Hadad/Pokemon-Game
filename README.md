@@ -1,5 +1,5 @@
 # Ex4 |Pokemon Game
-# introduction
+# Introduction
 This project is dedicated for planning a Pokemon Game.<br/>
 ## Little about Pokemon
 In Pokémon, humans, known as Pokémon Trainers, catch and train Pokémon to battle other Pokémon for sport. <br/>
@@ -11,4 +11,6 @@ Our game run on a graph with vertices and edges.
 * There are 16 stages (0-15) to the game. <br/>
 * Each game has a different number of agents and pokemons. <br/>
 * Our purpose it's catch as much as possible of pokemons with the agent. <br/>
-*
+# ***HOW TO PLAY IN WIKI!*** <br/>
+![Dotted Lattice Table of Contents Yearbook (1)](https://user-images.githubusercontent.com/93033782/148658671-0176c725-29f0-4939-a40d-1eba6669f4a4.jpg)
+
