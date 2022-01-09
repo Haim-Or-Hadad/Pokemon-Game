@@ -70,22 +70,6 @@ class GraphAlgo():
         return weight,path
 
 
-
-    def centerPoint(self) -> (int, float):
-        """
-        Finds the node that has the shortest distance to it's farthest node.
-        :return: The nodes id, min-maximum distance
-        """
-        for key in self.graph.nodes.values():
-            self.dijkstra(key.id)
-        min_value = sys.maxsize
-        for w in self.graph.nodes.values():
-            if w.max_weight < min_value:
-                t = (w.id, w.max_weight)
-                min_value = w.max_weight
-
-        return t
-
     def distance(self, pos1, pos2):
 
         dist = ((float(pos1[0]) - float(pos2[0])) ** 2 + (

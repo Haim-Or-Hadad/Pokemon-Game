@@ -179,7 +179,7 @@ while client.is_running() == 'true':
     # update screen changes
     display.update()
     # refresh rate
-    clock.tick(45)
+    clock.tick(9.5)
     catch = catch_algo(graph, client)
     check = client.get_info()
     catch.send_agent(agent_dict, pokemon_dict)

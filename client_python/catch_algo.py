@@ -1,8 +1,7 @@
 import math
-
 from client_python.client import Client
 from src.GraphAlgo import GraphAlgo
-from agent import *
+from client_python.agent import *
 
 EPS = 0.000000001
 
@@ -39,7 +38,7 @@ class catch_algo:
         else:
             while counter < len(priority_poke.queue):
                 priority_poke.queue[counter][1].takenby = ag.id
-                counter+=1
+                counter += 1
         # elif priority_poke.queue[1][1].takenby==9:
         #     priority_poke.queue[1][1].takenby = ag.id
         # else:
