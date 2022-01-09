@@ -10,15 +10,16 @@ class pokemon():
         self.type = type
         self.pos = pos
         self.src = 0
-        self.dest= 0
+        self.dest = 0
+        self.takenby = 9
 
     def pokemon_edge(self,id1_id2):
-        if id1_id2[0]>=id1_id2[1]:
-            src=id1_id2[1]
-            dest=id1_id2[0]
+        if int(id1_id2[0])>=int(id1_id2[1]):
+            src=int(id1_id2[1])
+            dest=int(id1_id2[0])
         else:
-            src=id1_id2[0]
-            dest=id1_id2[1]
+            src=int(id1_id2[0])
+            dest=int(id1_id2[1])
         if self.type>0: #src<dest
             self.src=src
             self.dest=dest
