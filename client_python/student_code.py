@@ -3,26 +3,28 @@
 OOP - Ex4
 """
 import ast
-
 import json
-
+from ctypes.wintypes import RGB
+import pygame
 from pygame import *
 from catch_algo import *
 from client_python.button import Button
-from game_display import *
 from client_python.pokemon import pokemon
 from src.GraphAlgo import GraphAlgo
 from client_python.agent import Agent
+
 
 # init pygame
 WIDTH, HEIGHT = 1080, 720
 
 # default port
 PORT = 6666
+
 # server host (default localhost 127.0.0.1)
 HOST = '127.0.0.1'
 count = 0
 pygame.init()
+
 #background
 img = pygame.transform.scale(pygame.image.load("pokemons_logo/pokemon_sea.jpg"),(WIDTH, HEIGHT))
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
@@ -72,6 +74,7 @@ client.start()
 ######agents into dict####
 agent_dict1 = json.loads(client.get_agents())
 agent_dict = Agent.build_agent(agent_dict1)
+
 while client.is_running() == 'true':
     agent_dict1 = json.loads(client.get_agents())
     Agent.update_agent_dict(agent_dict, agent_dict1)
@@ -92,7 +95,7 @@ while client.is_running() == 'true':
         # refresh surface
     img = pygame.transform.scale(img, (screen.get_width(), screen.get_height()))
     screen.blit(img, (0,0))
-    game = game_display(screen, graph)
+
 
    # draw edges
     for e in graph.get_graph().nodes.values():
@@ -106,17 +109,18 @@ while client.is_running() == 'true':
             dest_y = graph.get_graph().nodes.get(edge).y()
             dest_x = my_scale(dest_x, x=True)
             dest_y = my_scale(dest_y, y=True)
-            pygame.draw.line(screen, RGB(0,0,10), (src_x, src_y), (dest_x, dest_y), 5)
+            pygame.draw.line(screen, RGB(8,10,10), (src_x, src_y), (dest_x, dest_y), 4)
 
         # draw nodes
     for node in graph.get_graph().nodes.values():
         x = my_scale(node.x(), x=True)
         y = my_scale(node.y(), y=True)
         t = (x, y)
-        t1 = (x - 8, y - 10)
-        pygame.draw.circle(screen, RGB(60, 60, 60), t, 22)
-        pygame.draw.circle(screen, RGB(180, 255, 100), t, 18)
-        id_1 = FONT.render(str(node.id), False, RGB(25, 212, 120))
+        t1 = (x - 10, y - 10)
+        pygame.draw.circle(screen, RGB(60, 60, 60), t, 16)
+        pygame.draw.circle(screen, RGB(180, 255, 100), t, 14)
+        FONT = pygame.font.SysFont('ebrima', 15, bold=True)
+        id_1 = FONT.render(str(node.id), False, RGB(25, 212, 120), )
         screen.blit(id_1, t1)
 
     # draw agents
@@ -126,10 +130,10 @@ while client.is_running() == 'true':
         pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
         ball_image = pygame.image.load("pokemons_logo/ball.png")
-        ball_image = pygame.transform.scale(ball_image, (50, 30))
-        screen.blit(ball_image, (pos_x-15 , pos_y-15 ))
+        ball_image = pygame.transform.scale(ball_image, (25, 25))
+        screen.blit(ball_image, (pos_x-radius , pos_y-radius ))
 
-    # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
+    # draw pokemons
     for p in pokemon_dict:
         pos_x = p.x()
         pos_y = p.y()
@@ -137,29 +141,30 @@ while client.is_running() == 'true':
         pos_y = my_scale(pos_y, y=True)
         if 0 < p.value < 5 and p.type < 0:
             pok_image = pygame.image.load("pokemons_logo/blue_1.png")
-            pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x-15, pos_y-15))
+            pok_image = pygame.transform.scale(pok_image, (40, 40))
+            screen.blit(pok_image,(pos_x-radius, pos_y-radius))
 
         if 5 <= p.value and p.type < 0:
             pok_image = pygame.image.load("pokemons_logo/blue_2.png")
-            pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x-15, pos_y-15))
+            pok_image = pygame.transform.scale(pok_image, (40, 40))
+            screen.blit(pok_image,(pos_x-radius, pos_y-radius))
 
         if 0 < p.value <= 5 and p.type >= 0:
             pok_image = pygame.image.load("pokemons_logo/red_1.png")
-            pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x-15, pos_y-15))
+            pok_image = pygame.transform.scale(pok_image, (40, 40))
+            screen.blit(pok_image,(pos_x-radius, pos_y-radius))
 
         if 5 <= p.value and  p.type >= 0:
             pok_image = pygame.image.load("pokemons_logo/red_2.png")
-            pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x-15, pos_y-15))
+            pok_image = pygame.transform.scale(pok_image, (40, 40))
+            screen.blit(pok_image,(pos_x-radius, pos_y-radius))
 
 
     ####Timer and score####
     info=json.loads(client.get_info())
     ###time###
     time = client.time_to_end()
+    time = int(time)/1000
     time_to_end = Button('TIME TO END:'+str(time),(100, 70))
     time_to_end.render(screen,(55,0))
     ###score###

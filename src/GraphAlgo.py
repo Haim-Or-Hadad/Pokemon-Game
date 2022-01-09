@@ -3,8 +3,8 @@ import sys
 from queue import PriorityQueue
 from src.DiGraph import DiGraph
 
-
 WIDTH, HEIGHT = 1080, 720
+
 
 class GraphAlgo():
 
@@ -19,7 +19,7 @@ class GraphAlgo():
 
     def load_from_json(self, file_name: dict):
         """
-        Loads a graph from a json file.
+        Loads a graph from a dict.
         @param file_name: The path to the json file
         @returns True if the loading was successful, False o.w.
         """
@@ -67,15 +67,13 @@ class GraphAlgo():
 
         # path.append(curr_node.id)
         path.reverse()
-        return weight,path
-
+        return weight, path
 
     def distance(self, pos1, pos2):
 
         dist = ((float(pos1[0]) - float(pos2[0])) ** 2 + (
                 float(pos1[1]) - float(pos2[1])) ** 2) ** 0.5
         return dist
-
 
     def rest_tag_weight(self):
         for node in self.graph.nodes.values():
@@ -101,8 +99,6 @@ class GraphAlgo():
         for node in self.graph.nodes.values():
             if node.weight > self.graph.nodes.get(src).max_weight:
                 self.graph.nodes.get(src).max_weight = node.weight
-
-
 
     def min_x(self):
         min_x = sys.maxsize
@@ -131,3 +127,5 @@ class GraphAlgo():
             if node.y() > max_y:
                 max_y = node.y()
         return max_y
+
+

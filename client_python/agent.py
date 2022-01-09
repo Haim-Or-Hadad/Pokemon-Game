@@ -1,4 +1,6 @@
-from queue import PriorityQueue
+"""
+This class represents an agent that catch a pokemons
+"""
 
 
 class Agent:
@@ -12,36 +14,34 @@ class Agent:
         self.pos = pos
         self.agent_path = [self.src]
         self.last_dest = 0
-        self.Direction = None
 
     def last_item(self):
+        """
+        return:the last agent in the queue
+        """
         if len(self.agent_path) > 0:
             return self.agent_path[len(self.agent_path) - 1]
 
-    def update_der(self, dir):
-        self.Direction = dir
-
     def update_path(self, short_path: list, po):
+        """
+        returns: update queue of the agent path
+        """
         for n in short_path:
-            #if n not in self.agent_path:
             self.agent_path.append(n)
-        # if self.Direction is None:
-        #     self.agent_path.append(po.dest)
-        # if po.src <= po.dest and po.dest not in self.agent_path and self.Direction == "LEFT":
-        #     self.agent_path.append(po.dest)
-        # if po.src >= po.dest and po.dest not in self.agent_path and self.Direction == "RIGHT":
-        #     self.agent_path.append(po.dest)
         if po.dest not in self.agent_path:
             self.agent_path.append(po.dest)
 
     def show_path(self):
+        """
+        return:show the first element in the queue
+        """
         if len(self.agent_path) > 0:
             return self.agent_path[0]
 
-    def print_path(self):
-        print("Agent path: ", str(self.agent_path)[1:-1])
-
     def path_size(self):
+        """
+        return : return the size of the path
+        """
         return len(self.agent_path)
 
     def get_path(self):
@@ -73,6 +73,9 @@ class Agent:
             return float(check[1])
 
     def build_agent(agents: dict):
+        """
+        return: get dict of agents and build list of agents
+        """
         agent_list = []
         for a in agents['Agents']:  # O(1)
             for _, i in a.items():
@@ -83,6 +86,9 @@ class Agent:
         return agent_list
 
     def update_agent_dict(agent_list: dict, from_server: dict):
+        """
+        update agent dict each iteration
+        """
         for a in from_server['Agents']:
             for _, i in a.items():
                 A_id = int(i['id'])
@@ -91,3 +97,6 @@ class Agent:
                 agent_list[A_id].dest = i['dest']
                 agent_list[A_id].speed = i['speed']
                 agent_list[A_id].pos = i['pos']
+
+    def print_path(self):
+        print("Agent path: ", str(self.agent_path)[1:-1])
