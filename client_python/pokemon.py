@@ -9,6 +9,8 @@ class pokemon():
         self.value = value
         self.type = type
         self.pos = pos
+        self.src = 0
+        self.dest= 0
 
     def pokemon_edge(self,id1_id2):
         if id1_id2[0]>=id1_id2[1]:

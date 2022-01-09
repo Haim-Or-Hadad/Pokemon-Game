@@ -1,20 +1,14 @@
 """
-@author AchiyaZigi
+@authors Haim Or Hadad , Ilan Gold
 OOP - Ex4
-Very simple GUI example for python client to communicates with the server and "play the game!"
 """
 import ast
-from ctypes.wintypes import RGB
 
-from pygame import display
-from pygame.color import Color
-
-from client import Client
 import json
-import pygame
+
 from pygame import *
-import math
 from catch_algo import *
+from client_python.button import Button
 from game_display import *
 from client_python.pokemon import pokemon
 from src.GraphAlgo import GraphAlgo
@@ -23,27 +17,26 @@ from client_python.agent import Agent
 # init pygame
 WIDTH, HEIGHT = 1080, 720
 
-#background
-img = pygame.image.load("pokemons_logo/pokemon_sea.jpg")
-img = pygame.transform.scale(img,(1080, 720))
 # default port
 PORT = 6666
 # server host (default localhost 127.0.0.1)
 HOST = '127.0.0.1'
 count = 0
 pygame.init()
+#background
+img = pygame.transform.scale(pygame.image.load("pokemons_logo/pokemon_sea.jpg"),(WIDTH, HEIGHT))
 screen = display.set_mode((WIDTH, HEIGHT), depth=32, flags=RESIZABLE)
-pygame.display.set_caption('Resizable')
+pygame.display.set_caption('POKEMON GAME')
 clock = pygame.time.Clock()
 pygame.font.init()
-# screen.fill([0, 100, 210])
-screen.blit(img, (1080, 720))
+FONT = pygame.font.SysFont('ebrima', 20, bold=True)
+screen.blit(img, (WIDTH, HEIGHT))
 pygame.display.update()
 client = Client()
 client.start_connection(HOST, PORT)
 
+# GET GRAPH FROM SERVER
 graph_json = client.get_graph()
-FONT = pygame.font.SysFont('Arial', 20, bold=True)
 graph_json = ast.literal_eval(graph_json)
 graph = GraphAlgo()
 graph = graph.load_from_json(graph_json)
@@ -75,11 +68,7 @@ client.add_agent("{\"id\":3}")
 # this commnad starts the server - the game is running now
 client.start()
 
-"""
-The code below should be improved significantly:
-The GUI and the "algo" are mixed - refactoring using MVC design pattern is required.
-"""
-first_time = 0
+
 ######agents into dict####
 agent_dict1 = json.loads(client.get_agents())
 agent_dict = Agent.build_agent(agent_dict1)
@@ -95,23 +84,17 @@ while client.is_running() == 'true':
             pygame.quit()
             exit(0)
 
-    # refresh surface
+        if event.type == MOUSEBUTTONDOWN:
+            pos = pygame.mouse.get_pos()
+            if WIDTH-110 < pos[0] < WIDTH and HEIGHT-95 < pos[1] < HEIGHT:
+                Client.stop()
+
+        # refresh surface
     img = pygame.transform.scale(img, (screen.get_width(), screen.get_height()))
     screen.blit(img, (0,0))
-
-    # screen.fill([0, 100, 210])
     game = game_display(screen, graph)
-    # draw nodes
-    for node in graph.get_graph().nodes.values():
-        x = my_scale(node.x(), x=True)
-        y = my_scale(node.y(), y=True)
-        t = (x, y)
-        t1 = (x + 1, y + 1.80)
-        id_1 = FONT.render(str(node.id), False, RGB(25, 212, 120))
-        screen.blit(id_1, t1)
 
-        pygame.draw.circle(screen, RGB(118, 149, 195), t, 6)
-    # draw edges
+   # draw edges
     for e in graph.get_graph().nodes.values():
         src_x = e.x()
         src_y = e.y()
@@ -123,15 +106,18 @@ while client.is_running() == 'true':
             dest_y = graph.get_graph().nodes.get(edge).y()
             dest_x = my_scale(dest_x, x=True)
             dest_y = my_scale(dest_y, y=True)
-            pygame.draw.line(screen, RGB(160, 27, 195), (src_x, src_y), (dest_x, dest_y), 3)
-            # rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
-            # pygame.draw.polygon(screen, (120, 120, 130), (
-            #     (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
-            #     (
-            #         dest_x + 15 * math.sin(math.radians(rotation - 158)),
-            #         dest_y + 15 * math.cos(math.radians(rotation - 158))),
-            #     (dest_x + 15 * math.sin(math.radians(rotation + 158)),
-            #      dest_y + 15 * math.cos(math.radians(rotation + 158)))))
+            pygame.draw.line(screen, RGB(0,0,10), (src_x, src_y), (dest_x, dest_y), 5)
+
+        # draw nodes
+    for node in graph.get_graph().nodes.values():
+        x = my_scale(node.x(), x=True)
+        y = my_scale(node.y(), y=True)
+        t = (x, y)
+        t1 = (x - 8, y - 10)
+        pygame.draw.circle(screen, RGB(60, 60, 60), t, 22)
+        pygame.draw.circle(screen, RGB(180, 255, 100), t, 18)
+        id_1 = FONT.render(str(node.id), False, RGB(25, 212, 120))
+        screen.blit(id_1, t1)
 
     # draw agents
     for age in agent_dict:
@@ -139,8 +125,9 @@ while client.is_running() == 'true':
         pos_y = age.y()
         pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
-        pygame.draw.circle(screen, Color(122, 61, 23),
-                           (pos_x, pos_y), 10)
+        ball_image = pygame.image.load("pokemons_logo/ball.png")
+        ball_image = pygame.transform.scale(ball_image, (50, 30))
+        screen.blit(ball_image, (pos_x-15 , pos_y-15 ))
 
     # draw pokemons (note: should differ (GUI wise) between the up and the down pokemons (currently they are marked in the same way).
     for p in pokemon_dict:
@@ -148,54 +135,54 @@ while client.is_running() == 'true':
         pos_y = p.y()
         pos_x = my_scale(pos_x, x=True)
         pos_y = my_scale(pos_y, y=True)
-        if 0 < p.value < 3:
-            pok_image = pygame.image.load("pokemons_logo\weak_pokemon.png")
+        if 0 < p.value < 5 and p.type < 0:
+            pok_image = pygame.image.load("pokemons_logo/blue_1.png")
             pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x, pos_y))
+            screen.blit(pok_image,(pos_x-15, pos_y-15))
 
-        if 3 <= p.value <= 5:
-            pok_image = pygame.image.load("pokemons_logo\midium_pokemon.png")
+        if 5 <= p.value and p.type < 0:
+            pok_image = pygame.image.load("pokemons_logo/blue_2.png")
             pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x, pos_y))
+            screen.blit(pok_image,(pos_x-15, pos_y-15))
 
-        if 5 < p.value <= 7:
-            pok_image = pygame.image.load("pokemons_logo\pikacho-modified.png")
+        if 0 < p.value <= 5 and p.type >= 0:
+            pok_image = pygame.image.load("pokemons_logo/red_1.png")
             pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x, pos_y))
+            screen.blit(pok_image,(pos_x-15, pos_y-15))
 
-        if 8 <= p.value :
-            pok_image = pygame.image.load("pokemons_logo\mu.png")
+        if 5 <= p.value and  p.type >= 0:
+            pok_image = pygame.image.load("pokemons_logo/red_2.png")
             pok_image = pygame.transform.scale(pok_image, (50, 30))
-            screen.blit(pok_image,(pos_x, pos_y))
+            screen.blit(pok_image,(pos_x-15, pos_y-15))
 
-        #pygame.draw.circle(screen, Color(0, 255, 255), (pos_x, pos_y), 10)
 
     ####Timer and score####
     info=json.loads(client.get_info())
+    ###time###
+    time = client.time_to_end()
+    time_to_end = Button('TIME TO END:'+str(time),(100, 70))
+    time_to_end.render(screen,(55,0))
+    ###score###
     score=info['GameServer']['grade']
+    score = Button('score:'+str(score), (100, 70))
+    score.render(screen, (WIDTH-100, 0))
+    ###moves###
     moves=info['GameServer']['moves']
-    time=client.time_to_end()
-    score_x=32
-    score_y=34
-    score_x = my_scale(score_x, x=True)
-    score_y = my_scale(score_y, y=True)
-    score = FONT.render(str(score), False, RGB(25, 212, 120))
-    screen.blit(score,(score_x,score_y))
+    moves = Button('moves'+str(moves), (100, 70))
+    moves.render(screen, (WIDTH-200, 0))
+    ###stop###
+    stop = Button('STOP',(130,100))
+    stop.render(screen,(WIDTH-110,HEIGHT-95))
+
+
 
     # update screen changes
     display.update()
     # refresh rate
-    clock.tick(10)
-    if count == 335:
-        catch = catch_algo(graph, client)
-        check = client.get_info()
-        catch.send_agent(agent_dict, pokemon_dict)
-    # choose next
-    else:
-        catch = catch_algo(graph, client)
-        check = client.get_info()
-        catch.send_agent(agent_dict, pokemon_dict)
-        client.move()
-    count += 1
+    clock.tick(45)
+    catch = catch_algo(graph, client)
+    check = client.get_info()
+    catch.send_agent(agent_dict, pokemon_dict)
+    client.move()
 
 # game over:

@@ -1,24 +1,10 @@
-import itertools
-import json
 import random
 import sys
-from cmath import pi
-from ctypes.wintypes import RGB
 from queue import PriorityQueue
-from typing import List
-from easygui import *
-import pygame
-import pygame as pg
 from src.DiGraph import DiGraph
-from tkinter import filedialog, END, Tk
 
-from src.Node import *
-import math
-
-# bg = pygame.image.load("nodebook.jpg")
 
 WIDTH, HEIGHT = 1080, 720
-
 
 class GraphAlgo():
 
@@ -57,34 +43,6 @@ class GraphAlgo():
             print(e)
             return False
 
-    def save_to_json(self, file_name: str) -> bool:
-        """
-        Saves the graph in JSON format to a file
-        @param file_name: The path to the out file
-        @return: True if the save was successful, False o.w.
-        """
-        try:
-            Nodes = []  # List of Nodes and Edges.
-            Edges = []
-            # Going over all the nodes in the graph
-            for node in self.graph.get_all_v().values():
-                Nodes.append({"pos": node.pos, "id": node.id})  # add the node to the list
-                # going over all the edges going out of the current node
-                # edge_Dest is the key of the dest of the edge
-                for edges_Dest in self.graph.all_out_edges_of_node(node.id):
-                    # get the weight of the edge
-                    weight = self.graph.all_out_edges_of_node(node.id)[edges_Dest]
-                    Edges.append({"src": node.id, "w": weight, "dest": edges_Dest})
-            # create a dictionary contain Node list and Edge list
-            json_dict = {"Nodes": Nodes, "Edges": Edges}
-            with open("../data/" + file_name + ".json", 'w') as file:
-                # create the json file
-                json.dump(json_dict, indent=4, fp=file)
-        except IOError as e:
-            print(e)
-            return False
-        return True
-
     def shortest_path(self, id1: int, id2: int) -> (list):
         """
         Returns the shortest path from node id1 to node id2 using Dijkstra's Algorithm
@@ -111,28 +69,7 @@ class GraphAlgo():
         path.reverse()
         return weight,path
 
-    def TSP(self, node_lst: List[int]) -> (List[int], float):
-        """
-        Finds the shortest path that visits all the nodes in the list
-        :param node_lst: A list of nodes id's
-        :return: A list of the nodes id's in the path, and the overall distance
-        """
-        perm = list(itertools.permutations(node_lst))  # create a list with all the permutations
-        min_dist = math.inf  # set the min distance to max
-        for perm in perm:  # go over all the permutations
-            distance_sum = 0
-            for nodes in range(len(perm) - 1):  # go over the nodes in the current permutation
-                src = int(perm[nodes])
-                dest = int(perm[nodes + 1])
-                # sum the distance of the shortest path going over all the nodes in the curr permutations
-                distance_sum += self.shortest_path(src, dest)[0]
-            if distance_sum < min_dist:
-                min_dist = distance_sum
-                ans = (perm, min_dist)
-                if min_dist == math.inf:
-                    ans = ([], min_dist)
 
-        return ans
 
     def centerPoint(self) -> (int, float):
         """
@@ -181,66 +118,7 @@ class GraphAlgo():
             if node.weight > self.graph.nodes.get(src).max_weight:
                 self.graph.nodes.get(src).max_weight = node.weight
 
-    def draw_nodes(self, scr):
-        for node in self.graph.nodes.values():
-            x = node.x()
-            y = node.y()
-            x = self.my_scale(x, x=True)
-            y = self.my_scale(y, y=True)
-            t = (x, y)
-            pygame.draw.circle(scr, RGB(40, 40, 40), t, 6)
 
-    def scale(self, min_screen, max_screen, min_data, max_data):
-        """
-        get the scaled data with proportions min_data, max_data
-        relative to min and max screen dimentions
-        """
-        return ((self - min_data) / (max_data - min_data)) * (max_screen - min_screen) + min_screen
-
-    # decorate scale with the correct values
-
-    def my_scale(self, x=False, y=False):
-        if x:
-            return self.scale(self, 50, WIDTH - 50, self.min_x(), self.max_x())
-        if y:
-            return self.scale(self, 50, HEIGHT - 50, self.min_y(), self.max_y())
-
-    def draw_edges(self, scr):
-        for e in self.graph.nodes.values():
-            src_x = e.x()
-            src_y = e.y()
-            list_out = self.graph.all_out_edges_of_node(e.id)
-            src_x = self.my_scale(src_x, x=True)
-            src_y = self.my_scale(src_y, y=True)
-            for edge in list_out:
-                dest_x = self.graph.nodes.get(edge).x()
-                dest_y = self.graph.nodes.get(edge).y()
-                dest_x = self.my_scale(dest_x, x=True)
-                dest_y = self.my_scale(dest_y, y=True)
-                # t1,t2 = (src_x, src_y), (dest_x, dest_y)
-                pygame.draw.line(scr, RGB(0, 0, 0), (src_x, src_y), (dest_x, dest_y), 1)
-                rotation = math.degrees(math.atan2(src_y - dest_y, dest_x - src_x)) + 90
-                pygame.draw.polygon(scr, (120, 120, 130), (
-                    (dest_x + 0.5 * math.sin(math.radians(rotation)), dest_y + 0.5 * math.cos(math.radians(rotation))),
-                    (
-                        dest_x + 15 * math.sin(math.radians(rotation - 158)),
-                        dest_y + 15 * math.cos(math.radians(rotation - 158))),
-                    (dest_x + 15 * math.sin(math.radians(rotation + 158)),
-                     dest_y + 15 * math.cos(math.radians(rotation + 158)))))
-
-                # pygame.draw.line(scr, RGB(40, 40, 40),
-                #                  (src_x, src_y), (dest_x, dest_y))
-
-    # def draw_arrow(self, screen, colour, start, end):
-    #     pygame.draw.line(screen, colour, start, end, 2)
-    #     rotation = math.degrees(math.atan2(start[1] - end[1], end[0] - start[0])) + 90
-    #     pygame.draw.polygon(screen, (255, 0, 0), (
-    #         (end[0] + 20 * math.sin(math.radians(rotation)), end[1] + 20 * math.cos(math.radians(rotation))),
-    #         (
-    #             end[0] + 20 * math.sin(math.radians(rotation - 120)),
-    #             end[1] + 20 * math.cos(math.radians(rotation - 120))),
-    #         (end[0] + 20 * math.sin(math.radians(rotation + 120)),
-    #          end[1] + 20 * math.cos(math.radians(rotation + 120)))))
 
     def min_x(self):
         min_x = sys.maxsize

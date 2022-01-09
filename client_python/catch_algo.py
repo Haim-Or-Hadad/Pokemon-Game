@@ -71,7 +71,7 @@ class catch_algo:
                         ttl = self.client.time_to_end()
                         print(ttl, self.client.get_info())
                         #if flag==1:
-            self.client.move()
+            #self.client.move()
                             #flag+=1
 
     def load_curr_pokemons(self, pokemon_list: list):
